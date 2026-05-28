@@ -125,3 +125,9 @@ Batch reports also support `--format html`.
 Comparators subclass `biocompare.comparators.base.Comparator` and return a
 `biocompare.core.report.ConcordanceReport`. Third-party packages can register
 comparators with the `biocompare.comparators` entry point group.
+
+## Documentation
+
+Additional documentation is in `docs/`, including API notes, design rationale,
+and tutorials for regression testing, RNA-seq outputs, variant calls, and BED
+peak comparisons.
