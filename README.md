@@ -93,6 +93,15 @@ Run the tests:
 python3 -m unittest discover -s tests
 ```
 
+Install development tooling:
+
+```bash
+python3 -m pip install -e ".[dev]"
+python3 -m ruff check .
+python3 -m coverage run -m unittest discover -s tests
+python3 -m coverage report
+```
+
 Run a batch comparison from a manifest:
 
 ```bash
