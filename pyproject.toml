@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "biocompare"
+version = "0.1.0"
+description = "Semantic comparison reports for bioinformatics pipeline outputs."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "biocompare contributors" }
+]
+keywords = ["bioinformatics", "testing", "concordance", "pipeline", "comparison"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+
+[project.scripts]
+biocompare = "biocompare.cli:main"
+
+[project.entry-points."biocompare.comparators"]
+bam_stats = "biocompare.comparators.bam_stats:BAMStatsComparator"
+bed = "biocompare.comparators.bed:BEDComparator"
+counts = "biocompare.comparators.counts:CountsComparator"
+deg = "biocompare.comparators.deg:DEGComparator"
+fasta = "biocompare.comparators.fasta:FASTAComparator"
+table = "biocompare.comparators.table:TableComparator"
+vcf = "biocompare.comparators.vcf:VCFComparator"
+
+[tool.setuptools.packages.find]
+include = ["biocompare*"]

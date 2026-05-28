@@ -1,0 +1,5 @@
+gene_id	logFC	padj	status
+GENE1	1.2	0.010	up
+GENE2	-0.7	0.040	down
+GENE3	0.1	0.800	ns
+

@@ -1,0 +1,4 @@
+label	file_a	file_b	type
+table	table_a.tsv	table_b.tsv	table
+deg	degs_tool_a.tsv	degs_tool_b.tsv	deg
+bed	peaks_a.bed	peaks_b.bed	bed

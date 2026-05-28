@@ -1,0 +1,6 @@
+1100 + 0 in total (QC-passed reads + QC-failed reads)
+990 + 0 mapped (90.00% : N/A)
+120 + 0 duplicates
+900 + 0 paired in sequencing
+760 + 0 properly paired (84.44% : N/A)
+
