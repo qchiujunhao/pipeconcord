@@ -49,6 +49,7 @@ class VCFData:
     observations: dict[VariantKey, VariantObservation]
     duplicate_variants: int
     duplicate_observations: int
+    left_aligned_observations: int
 
 
 class VCFComparator(Comparator):
@@ -66,11 +67,18 @@ class VCFComparator(Comparator):
         return detect_file_type(file_a).kind == "vcf" and detect_file_type(file_b).kind == "vcf"
 
     def compare(self, file_a: str, file_b: str, **kwargs: object) -> ConcordanceReport:
-        vcf_a = read_vcf(file_a)
-        vcf_b = read_vcf(file_b)
-        warnings = [
-            "VCF variants are split by ALT allele and minimally normalized by trimming shared prefix/suffix bases; reference-based left alignment is not performed."
-        ]
+        reference_fasta = string_kwarg(kwargs, "reference_fasta")
+        reference_sequences = load_reference_fasta(reference_fasta) if reference_fasta else None
+        vcf_a = read_vcf(file_a, reference_sequences=reference_sequences)
+        vcf_b = read_vcf(file_b, reference_sequences=reference_sequences)
+        if reference_fasta:
+            warnings = [
+                "VCF variants are split by ALT allele, trimmed, and left-aligned where possible using the provided reference FASTA."
+            ]
+        else:
+            warnings = [
+                "VCF variants are split by ALT allele and minimally normalized by trimming shared prefix/suffix bases; reference-based left alignment is not performed."
+            ]
         if vcf_a.duplicate_variants:
             warnings.append(f"file_a contains {vcf_a.duplicate_variants} duplicate variant keys; kept the first occurrence.")
         if vcf_b.duplicate_variants:
@@ -127,10 +135,13 @@ class VCFComparator(Comparator):
         overall = clamp01(0.40 * variant_jaccard + 0.35 * gt_score + 0.15 * af_score + 0.10 * titv_similarity)
         details = {
             "normalization": "split_alt_alleles_and_trim_shared_bases",
+            "reference_fasta": reference_fasta,
             "file_a_raw_records": len(vcf_a.records),
             "file_b_raw_records": len(vcf_b.records),
             "file_a_variants": len(vcf_a.observations),
             "file_b_variants": len(vcf_b.observations),
+            "file_a_left_aligned_observations": vcf_a.left_aligned_observations,
+            "file_b_left_aligned_observations": vcf_b.left_aligned_observations,
             "shared_variants": len(shared_variants),
             "file_a_only_variants": len(variants_a - variants_b),
             "file_b_only_variants": len(variants_b - variants_a),
@@ -151,7 +162,7 @@ class VCFComparator(Comparator):
         )
 
 
-def read_vcf(path: str) -> VCFData:
+def read_vcf(path: str, *, reference_sequences: dict[str, str] | None = None) -> VCFData:
     samples: list[str] = []
     records: dict[VariantKey, VariantRecord] = {}
     duplicates = 0
@@ -190,7 +201,7 @@ def read_vcf(path: str) -> VCFData:
             format_keys=format_keys,
             samples=sample_map,
         )
-    observations, duplicate_observations = build_observations(records)
+    observations, duplicate_observations, left_aligned_observations = build_observations(records, reference_sequences=reference_sequences)
     return VCFData(
         path=str(path),
         samples=samples,
@@ -198,6 +209,7 @@ def read_vcf(path: str) -> VCFData:
         observations=observations,
         duplicate_variants=duplicates,
         duplicate_observations=duplicate_observations,
+        left_aligned_observations=left_aligned_observations,
     )
 
 
@@ -230,19 +242,29 @@ def genotype_concordance_counts(
     return matches, compared
 
 
-def build_observations(records: dict[VariantKey, VariantRecord]) -> tuple[dict[VariantKey, VariantObservation], int]:
+def build_observations(
+    records: dict[VariantKey, VariantRecord],
+    *,
+    reference_sequences: dict[str, str] | None = None,
+) -> tuple[dict[VariantKey, VariantObservation], int, int]:
     observations: dict[VariantKey, VariantObservation] = {}
     duplicates = 0
+    left_aligned = 0
     for record in records.values():
         for alt_index, alt in enumerate(record.key.alt.split(","), start=1):
             if alt in {"", ".", "*"}:
                 continue
             normalized_key = normalize_variant_key(record.key.chrom, record.key.pos, record.key.ref, alt)
+            if reference_sequences is not None:
+                aligned_key = left_align_variant_key(normalized_key, reference_sequences)
+                if aligned_key != normalized_key:
+                    left_aligned += 1
+                normalized_key = aligned_key
             if normalized_key in observations:
                 duplicates += 1
                 continue
             observations[normalized_key] = VariantObservation(key=normalized_key, record=record, alt_index=alt_index)
-    return observations, duplicates
+    return observations, duplicates, left_aligned
 
 
 def normalize_variant_key(chrom: str, pos: int, ref: str, alt: str) -> VariantKey:
@@ -264,6 +286,56 @@ def normalize_variant_key(chrom: str, pos: int, ref: str, alt: str) -> VariantKe
 
 def is_symbolic_alt(alt: str) -> bool:
     return alt.startswith("<") or "[" in alt or "]" in alt
+
+
+def left_align_variant_key(key: VariantKey, reference_sequences: dict[str, str]) -> VariantKey:
+    if key.chrom not in reference_sequences or len(key.ref) == len(key.alt) or is_symbolic_alt(key.alt):
+        return key
+    reference = reference_sequences[key.chrom]
+    current = key
+    while current.pos > 1:
+        previous_index = current.pos - 2
+        if previous_index >= len(reference):
+            break
+        previous_base = reference[previous_index].upper()
+        candidate = normalize_variant_key(
+            current.chrom,
+            current.pos - 1,
+            previous_base + current.ref,
+            previous_base + current.alt,
+        )
+        if candidate.pos >= current.pos:
+            break
+        current = candidate
+    return current
+
+
+def load_reference_fasta(path: str) -> dict[str, str]:
+    sequences: dict[str, list[str]] = {}
+    current_name: str | None = None
+    for line_number, line in enumerate(read_text_lines(path), start=1):
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith(">"):
+            current_name = stripped[1:].split()[0] if stripped[1:].split() else ""
+            if not current_name:
+                raise ValueError(f"{path!r} line {line_number} has an empty FASTA identifier")
+            sequences.setdefault(current_name, [])
+            continue
+        if current_name is None:
+            raise ValueError(f"{path!r} line {line_number} has sequence before a FASTA header")
+        sequences[current_name].append(stripped.upper())
+    return {name: "".join(parts) for name, parts in sequences.items()}
+
+
+def string_kwarg(kwargs: dict[str, object], name: str) -> str | None:
+    value = kwargs.get(name)
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        raise TypeError(f"{name} must be a string")
+    return value
 
 
 def alternate_dosage(genotype: str | None, alt_index: int) -> int | None:

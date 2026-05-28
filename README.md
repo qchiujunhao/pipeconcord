@@ -80,6 +80,14 @@ python3 -m biocompare compare tests/fixtures/calls_a.vcf tests/fixtures/calls_b.
   --type vcf
 ```
 
+Optionally provide a reference FASTA for simple repeated-indel left alignment:
+
+```bash
+python3 -m biocompare compare calls_a.vcf calls_b.vcf \
+  --type vcf \
+  --reference-fasta reference.fa
+```
+
 Compare alignment summary statistics:
 
 ```bash

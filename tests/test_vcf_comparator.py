@@ -112,3 +112,29 @@ class VCFComparatorTests(TestCase):
 
         self.assertEqual(report.metrics["variant_jaccard"], 1.0)
         self.assertEqual(report.details["normalization"], "split_alt_alleles_and_trim_shared_bases")
+
+    def test_reference_fasta_left_aligns_simple_repeated_indels(self):
+        with TemporaryDirectory() as temp_dir:
+            reference = Path(temp_dir) / "reference.fa"
+            left = Path(temp_dir) / "left.vcf"
+            right = Path(temp_dir) / "right.vcf"
+            reference.write_text(">chr1\nAAAAAA\n", encoding="utf-8")
+            left.write_text(
+                "##fileformat=VCFv4.3\n"
+                "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tS1\n"
+                "chr1\t3\t.\tAA\tA\t.\tPASS\t.\tGT\t0/1\n",
+                encoding="utf-8",
+            )
+            right.write_text(
+                "##fileformat=VCFv4.3\n"
+                "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tS1\n"
+                "chr1\t2\t.\tAA\tA\t.\tPASS\t.\tGT\t0/1\n",
+                encoding="utf-8",
+            )
+
+            unaligned_report = VCFComparator().compare(str(left), str(right))
+            aligned_report = VCFComparator().compare(str(left), str(right), reference_fasta=str(reference))
+
+        self.assertEqual(unaligned_report.metrics["variant_jaccard"], 0.0)
+        self.assertEqual(aligned_report.metrics["variant_jaccard"], 1.0)
+        self.assertEqual(aligned_report.details["file_a_left_aligned_observations"], 1)

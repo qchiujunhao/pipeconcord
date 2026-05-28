@@ -53,6 +53,7 @@ def add_common_options(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--gene-column", help="Gene identifier column override for DEG/count matrices.")
     parser.add_argument("--sample-columns", help="Counts comparator sample columns as a comma-separated list.")
     parser.add_argument("--min-reciprocal-overlap", type=float, help="BED interval match threshold. Default: 0.0 for any overlap.")
+    parser.add_argument("--reference-fasta", help="Reference FASTA for optional VCF indel left-alignment.")
     parser.add_argument("--logfc-column", help="DEG log-fold-change column override.")
     parser.add_argument("--padj-column", help="DEG adjusted p-value column override.")
     parser.add_argument("--pvalue-column", help="DEG raw p-value column override when adjusted p-values are absent.")
@@ -132,6 +133,7 @@ def comparison_kwargs(args: argparse.Namespace, *, include_file_type: bool = Tru
         "gene_column": args.gene_column,
         "sample_columns": args.sample_columns,
         "min_reciprocal_overlap": args.min_reciprocal_overlap,
+        "reference_fasta": args.reference_fasta,
         "logfc_column": args.logfc_column,
         "padj_column": args.padj_column,
         "pvalue_column": args.pvalue_column,

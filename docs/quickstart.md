@@ -78,8 +78,9 @@ The VCF comparator splits multiallelic ALT alleles and trims shared prefix/suffi
 bases before comparing normalized `CHROM/POS/REF/ALT` keys. It reports variant
 Jaccard, sample overlap, allele-specific genotype concordance, allele-frequency
 correlation, and Ti/Tv ratio similarity. Reference-based left alignment is not
-performed, so normalize against a reference upstream when complex indel
-representation differences matter.
+performed by default. Use `--reference-fasta reference.fa` to left-align simple
+repeated indels against a provided reference. Normalize upstream with dedicated
+VCF tooling when complex representation differences matter.
 
 Compare alignment summary statistics:
 
