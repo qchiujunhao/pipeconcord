@@ -12,6 +12,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/biocompare/
     permissions:
       contents: read
       id-token: write
