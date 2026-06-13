@@ -1,3 +1,4 @@
+import gzip
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import TestCase
@@ -21,6 +22,23 @@ class FileTypeTests(TestCase):
             detected = detect_file_type(str(path))
         self.assertEqual(detected.kind, "vcf")
 
+    def test_detects_gzipped_vcf_by_header(self):
+        with TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "calls.dat.gz"
+            with gzip.open(path, "wt", encoding="utf-8") as handle:
+                handle.write("##fileformat=VCFv4.3\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n")
+            detected = detect_file_type(str(path))
+        self.assertEqual(detected.kind, "vcf")
+        self.assertEqual(detected.reason, "VCF header")
+
+    def test_detects_gzipped_tsv_by_extension(self):
+        with TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "counts.tsv.gz"
+            with gzip.open(path, "wt", encoding="utf-8") as handle:
+                handle.write("gene\tsample_a\nG1\t10\n")
+            detected = detect_file_type(str(path))
+        self.assertEqual(detected.kind, "tsv")
+        self.assertEqual(detected.delimiter, "\t")
+
     def test_sniffs_csv_delimiter(self):
         self.assertEqual(sniff_delimiter("id,value\na,1\nb,2\n"), ",")
-
