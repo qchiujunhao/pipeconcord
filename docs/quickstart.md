@@ -1,20 +1,19 @@
 # Quickstart
 
-Install the current renamed package from GitHub:
-
-```bash
-python3 -m pip install git+https://github.com/qchiujunhao/pipeconcord.git
-```
-
-The renamed PyPI package will be published at
-<https://pypi.org/project/pipeconcord/>. After that release is available, install
-with:
+Install from PyPI:
 
 ```bash
 python3 -m pip install pipeconcord
 ```
 
+The package is published at <https://pypi.org/project/pipeconcord/>.
 PipeConcord requires Python 3.10 or newer.
+
+To test unreleased changes from the default branch, install from GitHub:
+
+```bash
+python3 -m pip install git+https://github.com/qchiujunhao/pipeconcord.git
+```
 
 Create two small TSV files:
 

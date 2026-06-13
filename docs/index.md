@@ -28,14 +28,13 @@ comparisons.
 
 ## Common Commands
 
-Install the current renamed package from GitHub:
+Install from PyPI:
 
 ```bash
-python3 -m pip install git+https://github.com/qchiujunhao/pipeconcord.git
+python3 -m pip install pipeconcord
 ```
 
-PyPI package target, pending first renamed release:
-<https://pypi.org/project/pipeconcord/>
+PyPI package: <https://pypi.org/project/pipeconcord/>
 
 ```bash
 pipeconcord compare file_a.tsv file_b.tsv --type table --key gene_id
