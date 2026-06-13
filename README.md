@@ -7,6 +7,10 @@ analytically meaningful ways.
 
 Project website: <https://qchiujunhao.github.io/biocompare/>
 
+Status: alpha. The core comparison model and initial comparators are usable, but
+APIs and metrics may change as more bioinformatics formats and workflows are
+validated.
+
 This repository currently implements the Phase 1 vertical slice:
 
 - a shared `ConcordanceReport` model
