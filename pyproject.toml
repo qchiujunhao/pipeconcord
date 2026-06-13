@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "biocompare"
 version = "0.1.0"
-description = "Semantic comparison reports for bioinformatics pipeline outputs."
+description = "Format-aware concordance reports for bioinformatics pipeline outputs."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -27,14 +27,15 @@ classifiers = [
 [project.optional-dependencies]
 dev = [
   "coverage[toml]>=7.0",
+  "mkdocs>=1.6",
   "ruff>=0.4",
 ]
 
 [project.urls]
-Homepage = "https://github.com/qchiujunhao/biocompare"
+Homepage = "https://qchiujunhao.github.io/biocompare/"
 Repository = "https://github.com/qchiujunhao/biocompare"
 Issues = "https://github.com/qchiujunhao/biocompare/issues"
-Documentation = "https://github.com/qchiujunhao/biocompare/tree/main/docs"
+Documentation = "https://qchiujunhao.github.io/biocompare/"
 
 [project.scripts]
 biocompare = "biocompare.cli:main"

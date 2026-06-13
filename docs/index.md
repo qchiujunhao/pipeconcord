@@ -5,6 +5,10 @@ instead of byte-for-byte snapshots. Each comparator returns the same
 `ConcordanceReport` shape, so one-off checks and batch regression tests can
 consume results consistently.
 
+The documentation site is intended for users evaluating the project as a tool
+for regression testing, pipeline validation, and reproducible scientific
+comparisons.
+
 ## Current Comparators
 
 | Type | Inputs | Main metrics |
@@ -37,3 +41,6 @@ python3 -m biocompare compare file_a.bed file_b.bed --type bed --format html --o
 - [Variant Caller Tutorial](tutorials/compare_variant_callers.md)
 - [Peak Caller Tutorial](tutorials/compare_peak_callers.md)
 
+## Source Repository
+
+- [GitHub repository](https://github.com/qchiujunhao/biocompare)

@@ -1,9 +1,11 @@
 # biocompare
 
-`biocompare` generates semantic concordance reports for bioinformatics pipeline
-outputs. Instead of only checking whether files are byte-for-byte identical, it
-compares shared rows and columns with metrics that are meaningful for tabular
-scientific outputs.
+`biocompare` is a Python toolkit for comparing bioinformatics pipeline outputs
+with semantic, format-aware metrics. Instead of only checking whether files are
+byte-for-byte identical, it measures whether two runs agree in biologically or
+analytically meaningful ways.
+
+Project website: <https://qchiujunhao.github.io/biocompare/>
 
 This repository currently implements the Phase 1 vertical slice:
 
@@ -145,9 +147,9 @@ comparators with the `biocompare.comparators` entry point group.
 
 ## Documentation
 
-Additional documentation is in `docs/`, including API notes, design rationale,
-and tutorials for regression testing, RNA-seq outputs, variant calls, and BED
-peak comparisons.
+Additional documentation is available on the project website and in `docs/`,
+including API notes, design rationale, and tutorials for regression testing,
+RNA-seq outputs, variant calls, and BED peak comparisons.
 
 ## Citation and Paper Draft
 

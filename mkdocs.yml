@@ -1,0 +1,20 @@
+site_name: biocompare
+site_description: Format-aware concordance reports for bioinformatics pipeline outputs
+site_url: https://qchiujunhao.github.io/biocompare/
+repo_url: https://github.com/qchiujunhao/biocompare
+repo_name: qchiujunhao/biocompare
+
+theme:
+  name: readthedocs
+
+nav:
+  - Home: index.md
+  - Quickstart: quickstart.md
+  - API: api.md
+  - Design: design.md
+  - Writing Comparators: writing_comparators.md
+  - Tutorials:
+      - Regression Testing: tutorials/regression_testing.md
+      - RNA-seq Pipelines: tutorials/compare_rnaseq_pipelines.md
+      - Variant Callers: tutorials/compare_variant_callers.md
+      - Peak Callers: tutorials/compare_peak_callers.md
